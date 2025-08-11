@@ -1,0 +1,61 @@
+import winston from 'winston';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Define log levels
+const levels = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  debug: 3,
+};
+
+// Define log colors
+const colors = {
+  error: 'red',
+  warn: 'yellow',
+  info: 'green',
+  debug: 'blue',
+};
+
+winston.addColors(colors);
+
+// Create winston logger
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  levels,
+  format: winston.format.combine(
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  defaultMeta: { service: 'assessment-api' },
+  transports: [
+    // Write errors to error.log
+    new winston.transports.File({
+      filename: path.join(process.cwd(), 'logs', 'error.log'),
+      level: 'error',
+    }),
+    // Write all logs to combined.log
+    new winston.transports.File({
+      filename: path.join(process.cwd(), 'logs', 'combined.log'),
+    }),
+  ],
+});
+
+// Add console transport for non-production environments
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      ),
+    })
+  );
+}
+
+export default logger;
