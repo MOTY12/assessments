@@ -2,9 +2,9 @@ import { param, body, query } from 'express-validator';
 
 export const userValidation = {
   updateUser: [
-    param('id')
-      .isInt({ min: 1 })
-      .withMessage('User ID must be a positive integer'),
+    body('id')
+      .isLength({ min: 2 })
+      .withMessage('User ID must be at least 2 characters long'),
     body('email')
       .optional()
       .isEmail()

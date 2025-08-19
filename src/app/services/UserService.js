@@ -30,38 +30,6 @@ class UserService {
     }
   }
 
-  /**
-   * Get all users with pagination
-   */
-  static async getAllUsers(page = 1, limit = 10, search = '') {
-    try {
-      const filter = {};
-      
-      // Apply search filter
-      if (search) {
-        filter.$or = [
-          { firstName: { $regex: search, $options: 'i' } },
-          { lastName: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } },
-        ];
-      }
-
-      const options = {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        sort: { createdAt: -1 },
-      };
-
-      const result = await User.paginate(filter, options);
-      
-      return {
-        users: result.docs,
-        pagination: Helper.paginationData(page, limit, result.total),
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
 
   /**
    * Get current user profile by ID
@@ -100,7 +68,7 @@ class UserService {
     try {
       // Remove password from update data if present (use separate method for password updates)
       const { password, ...safeUpdateData } = updateData;
-      
+      console.log('Safe update data:', safeUpdateData, 'for user ID:', id);
       const user = await User.findByIdAndUpdate(
         id,
         safeUpdateData,
@@ -192,49 +160,8 @@ class UserService {
     }
   }
 
-  /**
-   * Get users by role
-   */
-  static async getUsersByRole(role, page = 1, limit = 10) {
-    try {
-      const options = {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        sort: { createdAt: -1 },
-      };
 
-      const result = await User.paginate({ role, isActive: true }, options);
-      
-      return {
-        users: result.docs,
-        pagination: Helper.paginationData(page, limit, result.total),
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
 
-  /**
-   * Activate/Deactivate user
-   */
-  static async toggleUserStatus(id) {
-    try {
-      const user = await User.findById(id);
-      if (!user) {
-        throw genericErrors.notFound('User');
-      }
-
-      user.isActive = !user.isActive;
-      await user.save();
-
-      return user;
-    } catch (error) {
-      if (error.name === 'CastError') {
-        throw genericErrors.badRequest('Invalid user ID');
-      }
-      throw error;
-    }
-  }
 }
 
 export default UserService;

@@ -67,26 +67,6 @@ class AuthService {
   }
 
   /**
-   * Refresh access token
-   */
-  static async refreshToken(refreshToken) {
-    try {
-      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
-      const user = await UserService.getCurrentUserProfile(decoded.userId);
-      
-      if (!user) {
-        throw genericErrors.unauthorized;
-      }
-      
-      const tokens = this.generateTokens(user);
-      
-      return tokens;
-    } catch (error) {
-      throw genericErrors.unauthorized;
-    }
-  }
-
-  /**
    * Generate JWT tokens
    */
   static generateTokens(user) {

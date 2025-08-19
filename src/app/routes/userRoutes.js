@@ -6,14 +6,9 @@ import { authenticate } from '../middlewares/auth.js';
 
 const router = express.Router();
 
-// Get all users (protected route)
-router.get('/', 
-  authenticate, 
-  UserController.getAllUsers
-);
 
 // Update user (protected route)
-router.put('/:id', 
+router.put('/profile', 
   authenticate, 
   userValidation.updateUser, 
   validateRequest, 

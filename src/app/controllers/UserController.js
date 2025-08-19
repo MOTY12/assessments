@@ -2,32 +2,13 @@ import { Helper } from '../utils/index.js';
 import UserService from '../services/UserService.js';
 
 class UserController {
-  /**
-   * Get all users
-   */
-  static async getAllUsers(req, res, next) {
-    try {
-      const { page = 1, limit = 10, search } = req.query;
-      const result = await UserService.getAllUsers(page, limit, search);
-      
-      return Helper.successResponse(
-        req, 
-        res, 
-        result, 
-        200, 
-        'Users retrieved successfully'
-      );
-    } catch (error) {
-      next(error);
-    }
-  }
 
   /**
    * Update user
    */
   static async updateUser(req, res, next) {
     try {
-      const { id } = req.params;
+      const { id } = req.body;
       const updateData = req.body;
       const user = await UserService.updateUser(id, updateData);
       
